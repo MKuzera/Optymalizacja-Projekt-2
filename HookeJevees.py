@@ -2,12 +2,6 @@
 import math
 import numpy as np
 
-def funkcjaCelu(x):
-    x = np.array(x)
-    return x[0] * x[0]  + x[1]*x[1]  - math.cos(2.5*math.pi*x[0]) - math.cos(2.5*math.pi*x[1]) + 2
-
-
-
 
 # Hooke'a-Jeevesa.
 # Dane wejściowe:
@@ -27,15 +21,15 @@ def HJ(x0,s,alfa,epsilon,Nmax,funkcja):
 
     xb = np.copy(x0)
     xb_old = np.copy(x0)
-    print("xb {} x {} xbold {}".format(xb, x0, xb_old))
+    #print("xb {} x {} xbold {}".format(xb, x0, xb_old))
     counter =0
     while(True):
         counter+=1
-        print("XD")
-        print("xb {} x {} xbold {}".format(xb,x0,xb_old))
+       # print("XD")
+       # print("xb {} x {} xbold {}".format(xb,x0,xb_old))
         x = HJ_probuj(xb,s,funkcja)
         if funkcja(x) < funkcja(xb):
-            print("funkcja(x) {} < funkcja(xb) {}".format(funkcja(x) , funkcja(xb)))
+          #  print("funkcja(x) {} < funkcja(xb) {}".format(funkcja(x) , funkcja(xb)))
             while(True):
                 xb_old = np.copy(xb)
                 xb = np.copy(x)
@@ -63,7 +57,7 @@ def HJ_probuj(xb,s,funkcja):
 
     for i in range(n):
         x = xb + s*D[i]
-        print("X {}".format(x))
+
         if funkcja(x) < funkcja(xb):
             xb = np.copy(x)
         else:
