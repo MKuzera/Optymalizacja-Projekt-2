@@ -8,16 +8,10 @@ import numpy as np
 # maksymalna liczba wywołań funkcji celu Nmax
 
 def norm(A):
-   # nA = A.shape
-    #if nA[1] != 1:
-    #    raise ValueError("norm(A): Norm is defined only for column vectors")
     N = np.sum(A**2)
     return np.sqrt(N)
 
-
-
 def Rosenbrock(x0,s0,alfa,beta,epsilon,Nmax,funkcja):
-
     counter = 0
     n = x0.size
     l = np.zeros(n)
@@ -27,14 +21,16 @@ def Rosenbrock(x0,s0,alfa,beta,epsilon,Nmax,funkcja):
     for i in range(n):
         D[i][i] = 1
     x = np.copy(x0)
+    y = funkcja(x)
     while(True):
         counter+=1
         for i in range(n):
             xt = x + s[i]*D[i]
-            if funkcja(xt) < funkcja(x):
+            if funkcja(xt) < y:
                 x = xt
                 l[i] += s[i]
                 s[i] *= alfa
+                y = funkcja(x)
             else:
                 p[i] = p[i] + 1
                 s[i] = s[i] * (-beta)
@@ -49,12 +45,8 @@ def Rosenbrock(x0,s0,alfa,beta,epsilon,Nmax,funkcja):
             for i in range(n):
                 for j in range(i+1):
                     Q[i][j] = l[i]
-
-
             Q = D*Q
             V = Q[0] / norm(Q[0])
-
-
             D[:, 0] = V # set_col(D,v,0)
             i = 0
             j =0
@@ -64,11 +56,9 @@ def Rosenbrock(x0,s0,alfa,beta,epsilon,Nmax,funkcja):
                     transpose = np.transpose(Q[i])
                     temp = temp + (transpose*D[j]) * D[j]
                     j+=1
-
                 V = Q[i] - temp
                 D[:, i] = V
                 i+=1
-
             s = s0
             l = np.zeros(n)
             p = np.zeros(n)
@@ -77,5 +67,4 @@ def Rosenbrock(x0,s0,alfa,beta,epsilon,Nmax,funkcja):
             if max_s < abs(s[i]):
                 max_s = abs(s[i])
         if(max_s < epsilon or counter > Nmax):
-            print("ret2")
-            return x
+            return x, y, counter
