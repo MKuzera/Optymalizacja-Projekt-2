@@ -31,11 +31,11 @@ class RosenbrockOptimizer:
         while True:
             for i in range(n):
                 xt = x + s[i] * D[i]
-                if self.funkcja(xt) < y:
+                if self.funkcja(xt) < self.funkcja(x):
                     x = xt
                     l[i] += s[i]
                     s[i] *= self.alfa
-                    y = self.funkcja(x)
+                 #   y = self.funkcja(x)
                 else:
                     p[i] += 1
                     s[i] *= -self.beta
@@ -62,4 +62,4 @@ class RosenbrockOptimizer:
 
 
             if max_s < self.epsilon or self.counter > self.Nmax:
-                return x, y, self.counter
+                return x, self.funkcja(x), self.counter
