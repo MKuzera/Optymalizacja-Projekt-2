@@ -1,7 +1,8 @@
 import numpy as np
+from scipy.optimize import minimize
 
 class RosenbrockOptimizer:
-    def __init__(self, x0, s0, alfa, beta, epsilon, Nmax, fun):
+    def __init__(self, x0, s0, alfa, beta, epsilon, Nmax, fun, mode = None):
         self.x0 = x0
         self.s0 = s0
         self.alfa = alfa
@@ -10,56 +11,51 @@ class RosenbrockOptimizer:
         self.Nmax = Nmax
         self.fun = fun
         self.counter = 0
+        self.mode = mode
 
     def norm(self, A):
-        N = np.sum(A ** 2)
-        return np.sqrt(N)
+        return np.linalg.norm(A)
 
     def funkcja(self, x):
         self.counter += 1
         return self.fun(x)
 
     def optimize(self):
-        n = self.x0.size
+        if self.mode:
+            return  minimize(self.fun, self.s0, method='BFGS')
+        n = len(self.x0)
         l = np.zeros(n)
         p = np.zeros(n)
         s = np.copy(self.s0)
         D = np.eye(n)
         x = np.copy(self.x0)
-        y = self.funkcja(x)
 
         while True:
             for i in range(n):
-                xt = x + s[i] * D[i]
+                xt = x + s * D[:, i]
                 if self.funkcja(xt) < self.funkcja(x):
                     x = xt
-                    l[i] += s[i]
-                    s[i] *= self.alfa
-                 #   y = self.funkcja(x)
+                    l[i] += s
+                    s *= self.alfa
                 else:
                     p[i] += 1
-                    s[i] *= -self.beta
+                    s *= -self.beta
 
-            change = all(p[i] != 0 and l[i] != 0 for i in range(n))
+            change = any(p[i] != 0 and l[i] != 0 for i in range(n))
 
             if change:
                 Q = np.outer(l, np.ones(n))
-                Q = D * Q
-                V = Q[0] / self.norm(Q[0])
-                D[:, 0] = V
+                Q *= D
+                D = Q
                 for i in range(1, n):
-                    temp = np.zeros(n)
-                    for j in range(i):
-                        temp += np.dot(np.transpose(Q[i]), D[j]) * D[j]
-                    V = Q[i] - temp
-                    D[:, i] = V
+                    temp = np.dot(Q[:, i], D[:, :i])
+                    D[:, i] = Q[:, i] - temp
 
-                s = self.s0
+                s = max(s * self.alfa, 1e-6)
                 l = np.zeros(n)
                 p = np.zeros(n)
 
             max_s = np.max(np.abs(s))
-
 
             if max_s < self.epsilon or self.counter > self.Nmax:
                 return x, self.funkcja(x), self.counter
