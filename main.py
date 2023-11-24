@@ -12,12 +12,12 @@ import csv
 def funkcja_probna(x):
 
     return 2.5 * ((x[0] * x[0] - x[1])**2) + (1 - x[0])**2
+
+
+
 def funkcjaCelu(x):
     x = np.array(x)
-
     return x[0]**2 + x[1]**2 - math.cos(2.5*math.pi*x[0]) - math.cos(2.5*math.pi*x[1]) + 2
-
-
 
 if __name__ == '__main__':
 
@@ -28,8 +28,6 @@ if __name__ == '__main__':
     alfaHJ = 0.5 # w HJ alfa od 0 do 1
     alfaRB = 2.0 # w RB alfa > 1
     beta = 0.1
-
-
     randoms = np.array([np.random.uniform(-1, 1, 2) for _ in range(N)])
 
     with open('rb.csv', mode='w', newline='') as file:
