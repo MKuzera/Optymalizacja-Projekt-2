@@ -1,5 +1,10 @@
 import numpy as np
+import random
 
+def goal_function(x1, x2):
+    first = math.sin( math.pi * ( (x1/math.pi)**2 + (x2/math.pi)**2 )**0.5 )
+    second = math.pi * ( (x1/math.pi)**2 + (x2/math.pi)**2 )**0.5
+    return first / second
 class Vector(object):
     def __init__(self, x, y):
         """ Create a vector, example: v = Vector(1,2) """
@@ -73,7 +78,6 @@ def f(point, lambda_val):
 HISTORY = { 'b': [],
             'g': [],
             'w': [] }
-
 def nelder_mead(alpha=0.5, beta=0.5, gamma=0.2, maxiter=20, lambda_val = 1.0):
     
     # initialization
@@ -129,9 +133,42 @@ print("Result of Nelder-Mead algorithm: ")
 xk = nelder_mead()
 print(xk)
 # print("Best poits is: %s"%(xk))
+
+
+x_range = (-1, 1)
+y_range = (-1, 1)
+
+# Define the list of alpha values to test
 alpha_values = [4, 4.9, 5]
 
-for alpha in alpha_values:
-    for _ in range(100):
-        xk = nelder_mead(alpha=alpha)
-        print(f"Result of Nelder-Mead algorithm for alpha={alpha}: {xk}")
+# Open the csv file in write mode
+with open('results.csv', 'w', newline='') as file:
+    writer = csv.writer(file)
+    # Write the headers
+    writer.writerow(["x1*", "x2*", "r*", "y*", "Penalty Type", "Penalty Value"])
+
+    for alpha in alpha_values:
+        for _ in range(100):
+            # Generate a random starting point within the feasible region
+            x_start = random.uniform(*x_range)
+            y_start = random.uniform(*y_range)
+            start_point = Vector(x_start, y_start)
+
+            # Perform the optimization
+            result = nelder_mead(alpha=alpha, maxiter=1000, lambda_val = 1.0, v1=start_point)
+
+            # Check if the optimization result is less than 1e-3
+            if f(result.c(), 1.0) < 1e-3:
+                # After calculating x1*, x2*, r*, y*, write them to the csv file
+                x1_star = result.x
+                x2_star = result.y
+                r_star = math.sqrt(x1_star**2 + x2_star**2)  # distance from origin
+                y_star = goal_function(x1_star, x2_star)
+
+                external_penalty_val = external_penalty(result, A[0], lambda_val)
+                writer.writerow([x1_star, x2_star, r_star, y_star, "External", external_penalty_val])
+
+                internal_penalty_val = internal_penalty(x1_star, x2_star, A[0])
+                writer.writerow([x1_star, x2_star, r_star, y_star, "Internal", internal_penalty_val])
+
+                break
