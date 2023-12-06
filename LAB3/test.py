@@ -1,5 +1,7 @@
 import numpy as np
 import random
+import math
+import csv
 
 def goal_function(x1, x2):
     first = math.sin( math.pi * ( (x1/math.pi)**2 + (x2/math.pi)**2 )**0.5 )
@@ -78,12 +80,17 @@ def f(point, lambda_val):
 HISTORY = { 'b': [],
             'g': [],
             'w': [] }
-def nelder_mead(alpha=0.5, beta=0.5, gamma=0.2, maxiter=20, lambda_val = 1.0):
+def nelder_mead(alpha=0.5, beta=0.5, gamma=0.2, maxiter=20, lambda_val = 1.0, start_point=None):
     
     # initialization
-    v1 = Vector(0, 0)
-    v2 = Vector(1.0, 0)
-    v3 = Vector(0, 1)
+    if start_point is None:
+        v1 = Vector(0, 0)
+        v2 = Vector(1.0, 0)
+        v3 = Vector(0, 1)
+    else:
+        v1 = start_point
+        v2 = Vector(start_point.x + 1.0, start_point.y)
+        v3 = Vector(start_point.x, start_point.y + 1.0)
 
     for _ in range(maxiter):
         adict = {v1:f(v1.c(), lambda_val), v2:f(v2.c(), lambda_val), v3:f(v3.c(), lambda_val)}
@@ -129,10 +136,10 @@ def nelder_mead(alpha=0.5, beta=0.5, gamma=0.2, maxiter=20, lambda_val = 1.0):
         v3 = b + Vector(external_penalty(b, A[0], lambda_val), external_penalty(w, A[0], lambda_val))
     return b
 
-print("Result of Nelder-Mead algorithm: ")
-xk = nelder_mead()
-print(xk)
-# print("Best poits is: %s"%(xk))
+# print("Result of Nelder-Mead algorithm: ")
+# xk = nelder_mead()
+# print(xk)
+# # print("Best poits is: %s"%(xk))
 
 
 x_range = (-1, 1)
@@ -142,10 +149,12 @@ y_range = (-1, 1)
 alpha_values = [4, 4.9, 5]
 
 # Open the csv file in write mode
-with open('results.csv', 'w', newline='') as file:
-    writer = csv.writer(file)
+with open('results_external.csv', 'w', newline='') as file_external, open('results_internal.csv', 'w', newline='') as file_internal:
+    writer_external = csv.writer(file_external)
+    writer_internal = csv.writer(file_internal)
     # Write the headers
-    writer.writerow(["x1*", "x2*", "r*", "y*", "Penalty Type", "Penalty Value"])
+    writer_external.writerow(["x1*", "x2*", "r*", "y*", "Penalty Value"])
+    writer_internal.writerow(["x1*", "x2*", "r*", "y*", "Penalty Value"])
 
     for alpha in alpha_values:
         for _ in range(100):
@@ -155,7 +164,7 @@ with open('results.csv', 'w', newline='') as file:
             start_point = Vector(x_start, y_start)
 
             # Perform the optimization
-            result = nelder_mead(alpha=alpha, maxiter=1000, lambda_val = 1.0, v1=start_point)
+            result = nelder_mead(alpha=alpha, maxiter=1000, lambda_val = 1.0, start_point=start_point)
 
             # Check if the optimization result is less than 1e-3
             if f(result.c(), 1.0) < 1e-3:
@@ -165,10 +174,8 @@ with open('results.csv', 'w', newline='') as file:
                 r_star = math.sqrt(x1_star**2 + x2_star**2)  # distance from origin
                 y_star = goal_function(x1_star, x2_star)
 
-                external_penalty_val = external_penalty(result, A[0], lambda_val)
-                writer.writerow([x1_star, x2_star, r_star, y_star, "External", external_penalty_val])
+                external_penalty_val = external_penalty(result, A[0], lambda_val=1.0)
+                writer_external.writerow([x1_star, x2_star, r_star, y_star, external_penalty_val])
 
                 internal_penalty_val = internal_penalty(x1_star, x2_star, A[0])
-                writer.writerow([x1_star, x2_star, r_star, y_star, "Internal", internal_penalty_val])
-
-                break
+                writer_internal.writerow([x1_star, x2_star, r_star, y_star, internal_penalty_val])
