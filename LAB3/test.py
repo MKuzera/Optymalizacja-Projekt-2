@@ -38,7 +38,6 @@ def penalized_objective_function(x):
     return objective_function(x) + inner_penalty_function(x) + outer_penalty_function(x)
 
 # Początkowy punkt
-x0 = np.array([1.0, 1.0])
 
 alphas = [4, 4.4934, 5]
 for alpha in alphas:
