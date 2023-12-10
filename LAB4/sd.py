@@ -12,7 +12,9 @@ class Solution:
 
     def grad(self):
         g_calls += 1
-        pass
+        g = np.zeros(2)
+        g[0] = 10 * x[0] + 8 * x[1] - 34
+        g[1] = 8 * x[0] + 10 * x[1] - 38
 
     def hess(self):
         h_calls += 1
@@ -21,12 +23,10 @@ class Solution:
         h[0][1] = 0
         h[1][0] = 0
         h[1][1] = 10
-        # Implement Hessian matrix calculation here
-        pass
 
-    def fit_fun(self):
-        # Implement fitness function here
-        pass
+    def obj_fun(self):
+        f_calls += 1
+        y= (x[0] + 2 * x[1] - 7)**2 + (2 * x[0] + x[1] - 5)**2
 def compute_b(x, d, limits):
     n = x.shape[0]
     b = 1e9
@@ -47,21 +47,21 @@ def golden(a, b, epsilon, Nmax, O):
     A = Solution(a)
     B = Solution(b)
     C = Solution(B.x - alfa * (B.x - A.x))
-    C.fit_fun(O)
+    C.obj_fun(O)
     D = Solution(A.x + alfa * (B.x - A.x))
-    D.fit_fun(O)
+    D.obj_fun(O)
     while True:
         if C.y < D.y:
             B, D = D, C
             C.x = B.x - alfa * (B.x - A.x)
-            C.fit_fun(O)
+            C.obj_fun(O)
         else:
             A, C = C, D
             D.x = A.x + alfa * (B.x - A.x)
-            D.fit_fun(O)
+            D.obj_fun(O)
         if Solution.f_calls > Nmax or B.x - A.x < epsilon:
             A.x = (A.x + B.x) / 2.0
-            A.fit_fun(O)
+            A.obj_fun(O)
             return A
         
 
@@ -78,7 +78,7 @@ def Newton(x0, h0, epsilon, Nmax, O):
         else:
             X1 = Solution(X.x + h0 * d)
         if np.linalg.norm(X1.x - X.x) < epsilon or Solution.g_calls > Nmax or Solution.f_calls > Nmax or np.linalg.det(X.H) == 0:
-            X1.fit_fun()
+            X1.obj_fun()
             return X1
         X = X1
 def CG(x0, h0, epsilon, Nmax, O):
@@ -93,7 +93,7 @@ def CG(x0, h0, epsilon, Nmax, O):
         else:
             X1 = Solution(X.x + h0 * d)
         if np.linalg.norm(X1.x - X.x) < epsilon or Solution.g_calls > Nmax or Solution.f_calls > Nmax:
-            X1.fit_fun()
+            X1.obj_fun()
             return X1
         X1.grad()
         beta = np.linalg.norm(X1.g)**2 / np.linalg.norm(X.g)**2
@@ -111,6 +111,6 @@ def SD(x0, h0, epsilon, Nmax, O):
         else:
             X1 = Solution(X.x + h0 * d)
         if np.linalg.norm(X1.x - X.x) < epsilon or Solution.g_calls > Nmax or Solution.f_calls > Nmax:
-            X1.fit_fun()
+            X1.obj_fun()
             return X1
         X = X1
