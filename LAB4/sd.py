@@ -78,13 +78,6 @@ def Newton(x0, h0, epsilon, Nmax, O):
             X1 = Solution(X.x + h0 * d)
         if np.linalg.norm(X1.x - X.x) < epsilon or Solution.g_calls > Nmax or Solution.f_calls > Nmax or np.linalg.det(X.h) == 0:
             X1.obj_fun()
-            print("Newton")
-            print("f_calls")
-            print(X.f_calls)
-            print("g_calls")
-            print(X.g_calls)
-            print("h_calls")
-            print(X.h_calls)
             return X1
         X = X1
 def CG(x0, h0, epsilon, Nmax, O):
@@ -101,13 +94,6 @@ def CG(x0, h0, epsilon, Nmax, O):
         if np.linalg.norm(X1.x - X.x) < epsilon or Solution.g_calls > Nmax or Solution.f_calls > Nmax:
             X1.obj_fun()
             # Print calls number
-            print("CG")
-            print("f_calls")
-            print(X.f_calls)
-            print("g_calls")
-            print(X.g_calls)
-            print("h_calls")
-            print(X.h_calls)
             return X1
         X1.grad()
         beta = np.linalg.norm(X1.g)**2 / np.linalg.norm(X.g)**2
@@ -129,32 +115,36 @@ def SD(x0, h0, epsilon, Nmax, O):
             return X1
         X = X1
 
-# Define your initial guess
+
 x0 = np.array([0, 0])
 
-# Define your step size
+
 h0 = 0.1
 
-# Define your tolerance
+
 epsilon = 1e-6
 
-# Define your maximum number of iterations
+
 Nmax = 1000
 
-# Define your matrix O
+
 O = np.array([[0, 1], [1, 0]])
 
-# Call the Newton function
+
 result = Newton(x0, h0, epsilon, Nmax, O)
 
-# Print the result
-print(result.x)
 
+print(result.x)
+print(result.y)
+print(result.f_calls)
+print(result.g_calls)
 result=CG(x0, h0, epsilon, Nmax, O)
 print(result.x)
-
+print(result.y)
+print(result.f_calls)
+print(result.g_calls)
 result=SD(x0, h0, epsilon, Nmax, O)
 print(result.x)
-
-result=golden(x0, h0, epsilon, Nmax, O)
-print(result.x)
+print(result.y)
+print(result.f_calls)
+print(result.g_calls)
