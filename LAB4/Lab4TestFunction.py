@@ -57,6 +57,7 @@ class Lab4:
         return x
     
     def steepest_descent(self, starting_point, tolerance, max_iterations, fixed_step=True, step_size=0.05):
+        # najzybszy spadek
         x = starting_point
         for i in range(max_iterations):
             Lab4.ITERATION_COUNT+=1
