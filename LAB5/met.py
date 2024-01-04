@@ -1,10 +1,10 @@
+import csv
 import math
 
 import numpy as np
 
 
 num_function_calls = 0
-
 class Solution:
     def __init__(self, x1, x2, mutation_rate):
         global num_function_calls
@@ -15,7 +15,6 @@ class Solution:
         num_function_calls += 1
 
     def fit_fun(self):
-        # Define your fitness function here
         return self.x1**2 + self.x2**2 - math.cos(2.5*math.pi*self.x1)-math.cos(2.5*math.pi*self.x2) + 2
 
 def EA(N, epsilon, Nmax, O):
@@ -30,7 +29,7 @@ def EA(N, epsilon, Nmax, O):
             P[i].fit = P[i].fit_fun()
             num_function_calls += 1
             if P[i].fit < epsilon:
-                print(f"{P[i].fit} eps{epsilon} fcalls{num_function_calls} ")
+             #   print(f"{P[i].fit} eps{epsilon} fcalls{num_function_calls} ")
                 return P[i], num_function_calls
 
         IFF = [1 / P[i].fit for i in range(mi)]
@@ -57,23 +56,19 @@ def EA(N, epsilon, Nmax, O):
             P[i].fit = P[i].fit_fun()
             num_function_calls += 1
             if P[i].fit < epsilon:
-                print(f"2 {P[i].fit} eps{epsilon} fcalls{num_function_calls} ")
                 return P[i], num_function_calls
 
         P.sort(key=lambda x: x.fit)
         Pm = P[:mi]
 
         if Pm[0].fit < epsilon:
-            print(f"3 {P[i].fit} eps{epsilon} fcalls{num_function_calls} ")
             return Pm[0], num_function_calls
-    print(f"4 {P[i].fit} eps{epsilon} fcalls{num_function_calls} ")
+
     return Pm[0], num_function_calls
 
 #best_solution, num_function_calls = EA(10, 0.001, 10000, None)
 #print(f"x1: {best_solution.x1}, x2: {best_solution.x2}, fit: {best_solution.fit} calls:  {num_function_calls}")
 
-mutation_values = [0.01, 0.1, 1, 10, 100]
-dane = []
 #
 # jesli epsilon 0.001 to nic nie moze znalezc
 # jak 0.01 to cos znajduje
@@ -81,9 +76,26 @@ dane = []
 # przy nmax 3000 jedna iteracja sie liczy 1s xD
 # i tak zle wyniki sa wiekszosc
 #
+
+
+mutation_values = [0.01, 0.1, 1, 10, 100]
+dane = []
+
 for mutation in mutation_values:
     print(f"Running optimizations for mutation value: {mutation}")
     for i in range(100):
-        best_solution, num_function_calls = EA(mutation, 0.01,3000, None)
+        best_solution, num_function_calls = EA(mutation, 0.01,1000, None)
         print(f"Iter {i} x1: {best_solution.x1}, x2: {best_solution.x2}, fit: {best_solution.fit} calls:  {num_function_calls}")
+        dane.append([i + 1, best_solution.x1, best_solution.x2,best_solution.fit, num_function_calls])
         num_function_calls =0
+
+
+csv_filename = "iterations_data.csv"
+
+csv_headers = ["Iteration", "x1", "x2", "Best Fitness", "Number of Function Calls"]
+with open(csv_filename, 'w', newline='') as csvfile:
+    csv_writer = csv.writer(csvfile)
+    csv_writer.writerow(csv_headers)
+    csv_writer.writerows(dane)
+
+print(f"Dane zapisane do pliku CSV: {csv_filename}")
