@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 
 
@@ -14,7 +16,7 @@ class Solution:
 
     def fit_fun(self):
         # Define your fitness function here
-        return self.x1**2 + self.x2**2
+        return self.x1**2 + self.x2**2 - math.cos(2.5*math.pi*self.x1)-math.cos(2.5*math.pi*self.x2) + 2
 
 def EA(N, epsilon, Nmax, O):
     global num_function_calls
@@ -28,6 +30,7 @@ def EA(N, epsilon, Nmax, O):
             P[i].fit = P[i].fit_fun()
             num_function_calls += 1
             if P[i].fit < epsilon:
+                print(f"{P[i].fit} eps{epsilon} fcalls{num_function_calls} ")
                 return P[i], num_function_calls
 
         IFF = [1 / P[i].fit for i in range(mi)]
@@ -54,16 +57,33 @@ def EA(N, epsilon, Nmax, O):
             P[i].fit = P[i].fit_fun()
             num_function_calls += 1
             if P[i].fit < epsilon:
+                print(f"2 {P[i].fit} eps{epsilon} fcalls{num_function_calls} ")
                 return P[i], num_function_calls
 
         P.sort(key=lambda x: x.fit)
         Pm = P[:mi]
 
         if Pm[0].fit < epsilon:
+            print(f"3 {P[i].fit} eps{epsilon} fcalls{num_function_calls} ")
             return Pm[0], num_function_calls
-
+    print(f"4 {P[i].fit} eps{epsilon} fcalls{num_function_calls} ")
     return Pm[0], num_function_calls
 
-best_solution, num_function_calls = EA(100, 0.01, 100, None)
-print(f"x1: {best_solution.x1}, x2: {best_solution.x2}, fit: {best_solution.fit}")
-print(f"Number of function calls: {num_function_calls}")
+#best_solution, num_function_calls = EA(10, 0.001, 10000, None)
+#print(f"x1: {best_solution.x1}, x2: {best_solution.x2}, fit: {best_solution.fit} calls:  {num_function_calls}")
+
+mutation_values = [0.01, 0.1, 1, 10, 100]
+dane = []
+#
+# jesli epsilon 0.001 to nic nie moze znalezc
+# jak 0.01 to cos znajduje
+# 0.1 znajduje ale bardzo nie dokladne
+# przy nmax 3000 jedna iteracja sie liczy 1s xD
+# i tak zle wyniki sa wiekszosc
+#
+for mutation in mutation_values:
+    print(f"Running optimizations for mutation value: {mutation}")
+    for i in range(100):
+        best_solution, num_function_calls = EA(mutation, 0.01,3000, None)
+        print(f"Iter {i} x1: {best_solution.x1}, x2: {best_solution.x2}, fit: {best_solution.fit} calls:  {num_function_calls}")
+        num_function_calls =0

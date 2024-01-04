@@ -1,4 +1,4 @@
-import numpy as np
+Simport numpy as np
 import pandas as pd
 from numpy.linalg import inv
 from scipy.optimize import minimize_scalar

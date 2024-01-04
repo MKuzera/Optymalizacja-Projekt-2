@@ -1,3 +1,4 @@
+import csv
 import random
 import numpy as np
 from deap import base, creator, tools
@@ -22,11 +23,12 @@ toolbox.register("evaluate", funkcja_celu)
 toolbox.register("mate", tools.cxBlend, alpha=0.5)
 
 mutation_values = [0.01, 0.1, 1, 10, 100]
+dane = []
 
 for mutation in mutation_values:
     print(f"Running optimizations for mutation value: {mutation}")
     for i in range(100):
-        toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=mutation, indpb=0.1)
+        toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=mutation, indpb=0.01)
         toolbox.register("select", tools.selBest)
 
         pop = toolbox.population(n=100)
@@ -55,5 +57,21 @@ for mutation in mutation_values:
             pop[:] = offspring
 
         best_ind = tools.selBest(pop, 1)[0]
-        print(f"Iteration {i+1}: Best individual: {best_ind}, Best fitness: {best_ind.fitness.values}, Number of function calls: {num_function_calls}")
+      #  print(f"Iteration {i+1}: Best individual: {best_ind}, Best fitness: {best_ind.fitness.values}, Number of function calls: {num_function_calls}")
+        dane.append([i+1,best_ind,best_ind.fitness.values,num_function_calls])
         num_function_calls = 0  # Reset the counter for the next optimization
+
+csv_filename = "iterations_data.csv"
+
+# Nagłówki kolumn w pliku CSV
+csv_headers = ["Iteration", "Best Individual", "Best Fitness", "Number of Function Calls"]
+
+with open(csv_filename, 'w', newline='') as csvfile:
+    # Utwórz obiekt writer i zapisz nagłówki
+    csv_writer = csv.writer(csvfile)
+    csv_writer.writerow(csv_headers)
+
+    # Zapisz dane dla każdej iteracji
+    csv_writer.writerows(dane)
+
+print(f"Dane zapisane do pliku CSV: {csv_filename}")
