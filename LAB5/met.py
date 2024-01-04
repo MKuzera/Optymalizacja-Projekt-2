@@ -90,7 +90,7 @@ for mutation in mutation_values:
         num_function_calls =0
 
 
-csv_filename = "iterations_data.csv"
+csv_filename = "iterations_data2.csv"
 
 csv_headers = ["Iteration", "x1", "x2", "Best Fitness", "Number of Function Calls"]
 with open(csv_filename, 'w', newline='') as csvfile:
